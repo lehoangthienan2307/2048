@@ -19,7 +19,7 @@ public class Tile : MonoBehaviour
     }
     public void SetState(TileState state)
     {
-        this.tileState = state;
+        tileState = state;
 
         backgroundImage.color = state.backgroundColor;
         textNumber.color = state.textColor;
@@ -44,7 +44,7 @@ public class Tile : MonoBehaviour
         }
         tileCell = null;
         cell.tile.locked = true;
-        StartCoroutine(Animate(cell.transform.position, false));
+        StartCoroutine(Animate(cell.transform.position, true));
     }
     public void MoveTo(TileCell cell)
     {
@@ -55,7 +55,7 @@ public class Tile : MonoBehaviour
         
         tileCell = cell;
         tileCell.tile = this;
-        StartCoroutine(Animate(cell.transform.position, true));
+        StartCoroutine(Animate(cell.transform.position, false));
     }
     private IEnumerator Animate(Vector3 to, bool merging)
     {

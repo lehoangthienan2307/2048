@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class TileBoard : MonoBehaviour
 {
+    [SerializeField] private GameManager gameManager;
     [SerializeField] private Tile tilePrefab;
     [SerializeField] private TileState[] tileStates;
     [SerializeField] private TileGrid tileGrid;
@@ -14,12 +15,20 @@ public class TileBoard : MonoBehaviour
     {
         tiles = new List<Tile>();
     }
-    private void Start()
+    public void ClearBoard()
     {
-        CreateTile();
-        CreateTile();
+        foreach (TileCell cell in tileGrid.cells)
+        {
+            cell.tile = null;
+        }
+        
+        foreach (Tile tile in tiles)
+        {
+            Destroy(tile.gameObject);
+        }
+        tiles.Clear();
     }
-    private void CreateTile()
+    public void CreateTile()
     {
         Tile tile = Instantiate(tilePrefab, tileGrid.transform);
         tile.SetState(tileStates[0]);
@@ -133,5 +142,43 @@ public class TileBoard : MonoBehaviour
         {
             CreateTile();
         }
+        if (CheckForGameOver())
+        {
+            gameManager.GameOver();
+        }
+    }
+    private bool CheckForGameOver()
+    {
+        if (tiles.Count != tileGrid.size)
+        {
+            return false;
+        }
+
+        foreach (Tile tile in tiles)
+        {
+            TileCell up = tileGrid.GetAdjacentCell(tile.tileCell, Vector2Int.up);
+            TileCell down = tileGrid.GetAdjacentCell(tile.tileCell, Vector2Int.down);
+            TileCell left = tileGrid.GetAdjacentCell(tile.tileCell, Vector2Int.left);
+            TileCell right = tileGrid.GetAdjacentCell(tile.tileCell, Vector2Int.right);
+
+            if (up != null && CanMerge(tile, up.tile))
+            {
+                return false;
+            }
+            if (down != null && CanMerge(tile, down.tile))
+            {
+                return false;
+            }
+            if (left != null && CanMerge(tile, left.tile))
+            {
+                return false;
+            }
+            if (right != null && CanMerge(tile, right.tile))
+            {
+                return false;
+            }
+            
+        }
+        return true;
     }
 }
