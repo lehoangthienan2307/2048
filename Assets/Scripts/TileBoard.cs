@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -77,6 +78,11 @@ public class TileBoard : MonoBehaviour
         {
             if (adjacentCell.occupied)
             {
+                if (CanMerge(tile, adjacentCell.tile))
+                {
+                    Merge(tile, adjacentCell.tile);
+                    return true;
+                }
                 break;
             }
             newCell = adjacentCell;
@@ -90,10 +96,42 @@ public class TileBoard : MonoBehaviour
         }
         return false;
     }
+    private bool CanMerge(Tile a, Tile b)
+    {
+        return a.tileState.number == b.tileState.number && !b.locked;    
+    }
+    private void Merge(Tile a, Tile b)
+    {
+        tiles.Remove(a);
+        a.Merge(b.tileCell);    
+
+        int index = Math.Clamp(IndexOf(b.tileState) + 1, 0, tileStates.Length-1);
+        b.SetState(tileStates[index]);
+    }
+    private int IndexOf(TileState tileState)
+    {
+        for (int i=0; i < tileStates.Length; i++)
+        {
+            if (tileStates[i] == tileState)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
     private IEnumerator WaitForChanges()
     {
         waiting = true;
         yield return new WaitForSeconds(0.1f);
         waiting = false;
+        
+        foreach (Tile tile in tiles)
+        {
+            tile.locked = false;
+        }
+        if (tiles.Count != tileGrid.size)
+        {
+            CreateTile();
+        }
     }
 }
