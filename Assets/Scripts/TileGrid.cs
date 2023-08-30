@@ -24,6 +24,28 @@ public class TileGrid : MonoBehaviour
             }
         }
     }
+    public TileCell GetCell(int x, int y)
+    {
+        if (x >= 0 && x < width && y >= 0 && y < height)
+        {
+            return rows[y].cells[x];
+        }
+        else
+        {
+            return null;
+        }
+    }
+    public TileCell GetCell(Vector2Int coordinates)
+    {
+        return GetCell(coordinates.x, coordinates.y);
+    }
+    public TileCell GetAdjacentCell(TileCell tileCell, Vector2Int direction)
+    {
+        Vector2Int coordinates = tileCell.coordinates;
+        coordinates.x += direction.x;
+        coordinates.y -= direction.y;
+        return GetCell(coordinates);
+    }
     public TileCell GetRandomEmptyCell()
     {
         int index = Random.Range(0, size);
@@ -32,7 +54,7 @@ public class TileGrid : MonoBehaviour
         while (cells[index].occupied)
         {
             index++;
-            
+
             if (index >= size)
             {
                 index = 0;
