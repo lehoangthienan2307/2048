@@ -6,11 +6,14 @@ using UnityEngine;
 public class TileBoard : MonoBehaviour
 {
     [SerializeField] private GameManager gameManager;
+    [SerializeField] private SoundManager soundManager;
     [SerializeField] private Tile tilePrefab;
+    [SerializeField] private FloatingText floatingTextPrefab;
     [SerializeField] private TileState[] tileStates;
     [SerializeField] private TileGrid tileGrid;
     private List<Tile> tiles;
     private bool waiting;
+    private float moveTime = 0.1f;
     private void Awake()
     {
         tiles = new List<Tile>();
@@ -75,6 +78,7 @@ public class TileBoard : MonoBehaviour
         }
         if (changed)
         {
+            soundManager.Play(SoundId.SFX_2);
             StartCoroutine(WaitForChanges());
         }
     }
@@ -100,7 +104,7 @@ public class TileBoard : MonoBehaviour
 
         if (newCell != null)
         {
-            tile.MoveTo(newCell);
+            tile.MoveTo(newCell, moveTime);
             return true;
         }
         return false;
@@ -112,11 +116,13 @@ public class TileBoard : MonoBehaviour
     private void Merge(Tile a, Tile b)
     {
         tiles.Remove(a);
-        a.Merge(b.tileCell);    
+        a.Merge(b.tileCell, moveTime);    
 
         int index = Math.Clamp(IndexOf(b.tileState) + 1, 0, tileStates.Length-1);
         b.SetState(tileStates[index]);
 
+        Instantiate(floatingTextPrefab, b.transform).Init(b.tileState.number);
+        
         gameManager.IncreaseScore(b.tileState.number);
     }
     private int IndexOf(TileState tileState)
@@ -133,7 +139,7 @@ public class TileBoard : MonoBehaviour
     private IEnumerator WaitForChanges()
     {
         waiting = true;
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(moveTime);
         waiting = false;
         
         foreach (Tile tile in tiles)

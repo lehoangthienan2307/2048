@@ -17,6 +17,7 @@ public class Tile : MonoBehaviour
         backgroundImage = GetComponent<Image>();
         textNumber = GetComponentInChildren<TextMeshProUGUI>();
     }
+    
     public void SetState(TileState state)
     {
         tileState = state;
@@ -27,6 +28,8 @@ public class Tile : MonoBehaviour
     }
     public void Spawn(TileCell cell)
     {
+        transform.localScale = Vector2.zero;
+
         if (tileCell != null)
         {
             tileCell.tile = null;
@@ -35,8 +38,11 @@ public class Tile : MonoBehaviour
         tileCell = cell;
         tileCell.tile = this;
         transform.position = cell.transform.position;
+
+        transform.LeanScale(Vector2.one, 0.2f);
+        
     }
-    public void Merge(TileCell cell)
+    public void Merge(TileCell cell, float moveTime)
     {
         if (tileCell != null)
         {
@@ -44,9 +50,15 @@ public class Tile : MonoBehaviour
         }
         tileCell = null;
         cell.tile.locked = true;
-        StartCoroutine(Animate(cell.transform.position, true));
+
+        transform.LeanMove(cell.transform.position, moveTime).setOnComplete( () => { 
+            Destroy(gameObject);
+            cell.tile.transform.localScale = Vector2.zero;
+            float scaleTime = 0.5f;
+            cell.tile.transform.LeanScale(Vector2.one, scaleTime).setEaseOutElastic();
+        });
     }
-    public void MoveTo(TileCell cell)
+    public void MoveTo(TileCell cell, float moveTime)
     {
         if (tileCell != null)
         {
@@ -55,26 +67,7 @@ public class Tile : MonoBehaviour
         
         tileCell = cell;
         tileCell.tile = this;
-        StartCoroutine(Animate(cell.transform.position, false));
+        transform.LeanMove(cell.transform.position, moveTime);
     }
-    private IEnumerator Animate(Vector3 to, bool merging)
-    {
-        float elapsed = 0f;
-        float duration= 0.1f;
-        Vector3 from = transform.position;
-
-        while (elapsed < duration) 
-        {
-            transform.position = Vector3.Lerp(from, to, elapsed/duration);
-            elapsed += Time.deltaTime;
-            yield return null;
-        } 
-
-        transform.position = to;
-
-        if (merging)
-        {
-            Destroy(gameObject);
-        }
-    }
+    
 }

@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] private SoundManager soundManager;
     [SerializeField] private TileBoard tileBoard;
     [SerializeField] private CanvasGroup gameOver;
     [SerializeField] private TextMeshProUGUI scoreText;
@@ -15,6 +16,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         NewGame();
+        soundManager.Play(SoundId.BGM_1);
     }
     public void NewGame()
     {
@@ -54,6 +56,7 @@ public class GameManager : MonoBehaviour
     }
     public void IncreaseScore(int points)
     {
+        soundManager.Play(SoundId.SFX_1);
         SetScore(score + points);
     }
     private void SetScore(int score)
