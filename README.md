@@ -1,5 +1,7 @@
 # 2048
 This classic puzzle game challenges your strategic thinking and number manipulation skills. The objective is simple: combine tiles to reach the coveted 2048 tile and achieve the highest score possible.</br>
+[![Watch the video](https://img.youtube.com/vi/3itUQBUglzA/hqdefault.jpg)](https://www.youtube.com/embed/3itUQBUglzA)
+</br>
 ## How To Play
 The aim is simple: combine tiles with matching numbers to create larger numbers. Your goal is to reach the magical 2048 tile. 
 Use the arrow keys to slide the tiles in different directions—up, down, left, or right. 
